@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.akak4456.mapper.NoticeMapper">
+<select id="getList" resultType="org.akak4456.domain.NoticeVO">
+	<![CDATA[
+	select * from tbl_notice where bno > 0
+	]]>
+</select>
+<select id="getListWithPaging" resultType="org.akak4456.domain.NoticeVO">
+	<![CDATA[
+	select
+		bno,title,content,regdate,updatedate
+	from
+		(
+		select /*+INDEX_DESC(tbl_notice pk_notice) */
+			rownum rn, bno, title, content, regdate, updatedate
+		from
+			tbl_notice
+		where rownum <= #{pageNum} * #{amount}
+		)
+	where rn > (#{pageNum}-1)*#{amount}
+	]]>
+</select>
+<insert id="insertSelectKey">
+	<selectKey keyProperty="bno" order="BEFORE" resultType="long">
+		select seq_notice.nextval from dual
+	</selectKey>
+	insert into tbl_notice(bno,title,content)
+	values (#{bno},#{title},#{content})
+</insert>
+<select id="read" resultType="org.akak4456.domain.NoticeVO">
+	select * from tbl_notice where bno = #{bno}
+</select>
+<delete id="delete">
+	delete tbl_notice where bno=#{bno}
+</delete>
+<update id="update">
+	update tbl_notice
+	set
+		title=#{title},
+		content=#{content},
+		updatedate=sysdate
+	where bno = #{bno}
+</update>
+</mapper>

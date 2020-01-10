@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.akak4456.mapper.CourseMapper">
+<select id="getList" resultType="org.akak4456.domain.CourseVO">
+	select * from tbl_course
+</select>
+<select id="getListWithPaging" resultType="org.akak4456.domain.CourseVO">
+	<![CDATA[
+	select
+		coursenumber,title,grade,point,kind,timeandplace,professor,evaluationmethod
+	from
+		(
+		select
+			rownum rn,coursenumber,title,grade,point,kind,timeandplace,professor,evaluationmethod
+		from
+			tbl_course
+		where rownum <= #{pageNum} * #{amount}
+		)
+	where rn > (#{pageNum}-1)*#{amount}
+	]]>
+</select>
+<select id="read" resultType="org.akak4456.domain.CourseVO">
+	select * from tbl_course where coursenumber = #{coursenumber}
+</select>
+</mapper>

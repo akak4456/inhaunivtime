@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.akak4456.mapper.CourseRateMapper">
+<select id="getList" resultType="org.akak4456.domain.CourseRateVO">
+	<![CDATA[
+	select * from tbl_course_rate where rateno > 0
+	]]>
+</select>
+<select id="getListWithPaging" resultType="org.akak4456.domain.CourseRateVO">
+	<![CDATA[
+	select
+		rateno, coursenumber, username, score, content
+	from
+		(
+		select /*+INDEX_DESC(tbl_course_rate pk_course_rate) */
+			rownum rn, rateno, coursenumber, username, score, content
+		from
+			tbl_course_rate
+		where rownum <= #{pageNum} * #{amount}
+		)
+	where rn > (#{pageNum}-1)*#{amount}
+	]]>
+</select>
+<select id="read" resultType="org.akak4456.domain.CourseRateVO">
+	select * from tbl_course_rate where rateno = #{rateno}
+</select>
+<insert id="insertSelectKey">
+	<selectKey keyProperty="rateno" order="BEFORE" resultType="long">
+		select seq_course_rate.nextval from dual
+	</selectKey>
+	insert into tbl_course_rate(rateno, coursenumber, username, score, content)
+	values (#{rateno},#{coursenumber},#{username},#{score},#{content})
+</insert>
+<delete id="delete">
+	delete tbl_course_rate where rateno=#{rateno}
+</delete>
+<update id="update">
+	update tbl_course_rate
+	set
+		coursenumber = #{coursenumber},
+		score = #{score},
+		content = #{content}
+	where rateno = #{rateno}
+</update>
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.akak4456.mapper.FreeBoardMapper">
+<select id="getList" resultType="org.akak4456.domain.FreeBoardVO">
+	<![CDATA[
+	select * from tbl_free_board where bno > 0
+	]]>
+</select>
+<select id="getListWithPaging" resultType="org.akak4456.domain.FreeBoardVO">
+	<![CDATA[
+	select
+		bno,title,content,writername,replycnt,recommendcnt ,regdate,updatedate
+	from
+		(
+		select /*+INDEX_DESC(tbl_free_board pk_free_board) */
+			rownum rn, bno, title,content,writername,replycnt,recommendcnt, regdate, updatedate
+		from
+			tbl_free_board
+		where
+	]]>
+	<include refid="criteria"></include>
+	<![CDATA[	
+			rownum <= #{pageNum} * #{amount}
+		)
+	where rn > (#{pageNum}-1)*#{amount}
+	]]>
+</select>
+<select id="getHotBoard" resultType="org.akak4456.domain.FreeBoardVO">
+	<![CDATA[
+	select /*+INDEX(tbl_free_board idx_free_board) */
+		rownum,bno,title,content,writername,replycnt,recommendcnt,regdate,updatedate
+	from
+		tbl_free_board
+	where (sysdate - regdate) <= 1 and rownum <= #{amount}
+	]]>
+</select>
+<insert id="insertSelectKey">
+
+
+
+	<selectKey keyProperty="bno" order="BEFORE" resultType="long">
+		select seq_free_board.nextval from dual
+	</selectKey>
+	insert into tbl_free_board(bno,title,content,writername)
+	values (#{bno},#{title},#{content},#{writername})
+</insert>
+<select id="read" resultType="org.akak4456.domain.FreeBoardVO">
+	select * from tbl_free_board where bno = #{bno}
+</select>
+<delete id="delete">
+	delete tbl_free_board where bno=#{bno}
+</delete>
+<update id="update">
+	update tbl_free_board
+	set
+		title=#{title},
+		content=#{content},
+		updatedate=sysdate
+	where bno = #{bno}
+</update>
+<update id="updateReplyCnt">
+	update tbl_free_board set replycnt = replycnt + #{amount} where bno = #{bno}
+</update>
+<update id="updateRecommendCnt">
+	update tbl_free_board set recommendcnt = recommendcnt + #{amount} where bno = #{bno}
+</update>
+<select id="getTotalCount" resultType="int">
+	select count(*) from tbl_free_board where bno > 0
+</select>
+<sql id="criteria">
+	<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+		<foreach item='type' collection="typeArr">
+			<trim prefix="OR">
+				<choose>
+					<when test="type == 'T'.toString()">
+						title like '%'||#{keyword}||'%'
+					</when>
+					<when test="type == 'C'.toString()">
+						content like '%'||#{keyword}||'%'
+					</when>
+					<when test="type == 'W'.toString()">
+						writername like '%'||#{keyword}||'%'
+					</when>
+				</choose>
+			</trim>
+		</foreach>
+	</trim>
+</sql>
+</mapper>
