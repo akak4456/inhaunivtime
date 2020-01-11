@@ -5,6 +5,8 @@ import java.util.List;
 import org.akak4456.domain.AttachVO;
 import org.akak4456.domain.Criteria;
 import org.akak4456.domain.FreeBoardVO;
+import org.akak4456.domain.NoticeVO;
+import org.akak4456.domain.ReportVO;
 
 public interface FreeBoardService {
 	public void register(FreeBoardVO freeBoard);
@@ -22,4 +24,10 @@ public interface FreeBoardService {
 	public int getTotal(Criteria cri);
 	
 	public List<AttachVO> getAttachList(Long bno);
+	
+	public List<FreeBoardVO> getHotList(int amount);
+	
+	public void report(ReportVO report);
+	
+	public NoticeVO getRecentOneNotice();
 }

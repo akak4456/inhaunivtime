@@ -5,8 +5,12 @@ import java.util.List;
 import org.akak4456.domain.AttachVO;
 import org.akak4456.domain.Criteria;
 import org.akak4456.domain.FreeBoardVO;
+import org.akak4456.domain.NoticeVO;
+import org.akak4456.domain.ReportVO;
 import org.akak4456.mapper.AttachMapper;
 import org.akak4456.mapper.FreeBoardMapper;
+import org.akak4456.mapper.NoticeMapper;
+import org.akak4456.mapper.ReportMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +24,12 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	
 	@Setter(onMethod_ = @Autowired)
 	private AttachMapper attachMapper;
+	
+	@Setter(onMethod_ = @Autowired)
+	private ReportMapper reportMapper;
+	
+	@Setter(onMethod_ = @Autowired)
+	private NoticeMapper noticeMapper;
 	@Override
 	public void register(FreeBoardVO freeBoard) {
 		// TODO Auto-generated method stub
@@ -71,7 +81,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	@Override
 	public boolean recommendCountUp(Long bno) {
 		// TODO Auto-generated method stub
-		//³ªÁß¿¡ tbl_memberÀÇ recommendÀÇ °ªµµ ¿Ã¸±°Í
+		//ï¿½ï¿½ï¿½ß¿ï¿½ tbl_memberï¿½ï¿½ recommendï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¸ï¿½ï¿½ï¿½
 		return freeBoardMapper.updateRecommendCnt(bno, 1) == 1;
 	}
 
@@ -85,6 +95,25 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	public List<AttachVO> getAttachList(Long bno) {
 		// TODO Auto-generated method stub
 		return attachMapper.findByBno(bno);
+	}
+
+	@Override
+	public List<FreeBoardVO> getHotList(int amount) {
+		// TODO Auto-generated method stub
+		return freeBoardMapper.getHotBoard(amount);
+	}
+
+	@Override
+	public void report(ReportVO report) {
+		// TODO Auto-generated method stub
+		reportMapper.insertSelectKey(report);
+	}
+
+	@Override
+	public NoticeVO getRecentOneNotice() {
+		// TODO Auto-generated method stub
+		Criteria cri = new Criteria(1,1);
+		return noticeMapper.getListWithPaging(cri).get(0);
 	}
 
 }

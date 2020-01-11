@@ -6,9 +6,59 @@
 <div id="wrapper">
 	<%@include file="../includes/wrapper_sidebar.jsp"%>
 	<div id="content-wrapper">
-
 		<div class="container-fluid">
-
+			<div class="card mb-3">
+				<div class="card-header">
+					<i class="fas fa-volume-up"></i> 공지사항
+				</div>
+				<div class="card-body">
+					<a class='moveNotice' href='<c:out value="${noticeone.bno }"/>'>
+						<c:out value="${noticeone.title }"/>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="card mb-3">
+				<div class="card-header">
+					<i class="fas fa-table"></i> HOT 10
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-bordered" id="dataTable" width="100%"
+							cellspacing="0">
+							<thead>
+								<tr>
+									<th>#번호</th>
+									<th>제목</th>
+									<th>작성자</th>
+									<th>작성일</th>
+									<th>수정일</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${hotboard }" var="freeboard">
+								<tr>
+									<td><c:out value="${freeboard.bno }"/></td>
+									<td>
+										<a class='move' href='<c:out value="${freeboard.bno }"/>'>
+											<c:out value="${freeboard.title }"/>
+										</a>
+										[<c:out value="${freeboard.replycnt }"/>] 
+										<c:if test = "${freeboard.recommendcnt >0}">
+											<img src="/resources/img/like.png" width="20px" height="20px"> <c:out value="${freeboard.recommendcnt }"/>
+										</c:if>
+									</td>
+									<td><c:out value="${freeboard.writername }"/></td>
+									<td><fmt:formatDate pattern="yyyy-MM-dd" value="${freeboard.regdate }"/></td>
+									<td><fmt:formatDate pattern="yyyy-MM-dd" value="${freeboard.updatedate }"/></td>
+								</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 			<div class="card mb-3">
 				<div class="card-header">
 					<i class="fas fa-table"></i> 자유게시판

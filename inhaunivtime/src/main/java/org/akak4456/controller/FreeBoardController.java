@@ -3,12 +3,14 @@ package org.akak4456.controller;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import org.akak4456.domain.AttachVO;
 import org.akak4456.domain.Criteria;
 import org.akak4456.domain.FreeBoardVO;
 import org.akak4456.domain.PageDTO;
+import org.akak4456.domain.ReportVO;
 import org.akak4456.service.FreeBoardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,6 +44,8 @@ public class FreeBoardController {
 		log.info("page: "+page );
 		model.addAttribute("pageMaker",page);
 		model.addAttribute("list",freeBoardService.getList(cri));
+		model.addAttribute("hotboard",freeBoardService.getHotList(10));
+		model.addAttribute("noticeone",freeBoardService.getRecentOneNotice());
 	}
 	
 	@GetMapping("/register")
@@ -108,6 +113,18 @@ public class FreeBoardController {
 		
 		return new ResponseEntity<>(freeBoardService.getAttachList(bno),HttpStatus.OK);
 	}
+	@PostMapping(value ="/report", consumes="application/json", produces= {MediaType.TEXT_PLAIN_VALUE})
+	public ResponseEntity<String> report(@RequestBody ReportVO vo) {
+		log.info("report: "+vo.getTargetno());
+		try {
+			freeBoardService.report(vo);
+			log.info("report success");
+			return new ResponseEntity<>("success",HttpStatus.OK);
+		}catch(Exception e) {
+			log.info("someone already report");
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 	private void deleteFiles(List<AttachVO> attachList) {
 		if(attachList == null || attachList.size() == 0) {
 			return;
@@ -125,4 +142,5 @@ public class FreeBoardController {
 			}
 		});
 	}
+	
 }

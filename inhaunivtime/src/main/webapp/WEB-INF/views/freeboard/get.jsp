@@ -19,6 +19,10 @@ ul.chat{
 	list-style:none;
 	padding:10px;
 }
+.sirenBtn{
+	width:30%;
+	height:30%;
+}
 </style>
 <div id="wrapper">
 	<%@include file="../includes/wrapper_sidebar.jsp"%>
@@ -58,6 +62,9 @@ ul.chat{
 					<button data-oper='modify' class="btn btn-success">수정/삭제</button>
 					<button data-oper='recommend' class="btn btn-success">추천하기</button>
 					<button data-oper='list' class="btn btn-info">목록</button>
+					<div class='float-right'>
+						<img data-bno='<c:out value='${freeboard.bno }'/>' data-casekind='b' data-targetno='<c:out value='${freeboard.bno }'/>' class="sirenBtn" src='/resources/img/siren.png'>
+					</div>
 					<form id='operForm' action="/freeboard/modify" method="get">
 						<input type='hidden' id='bno' name='bno' value='<c:out value="${freeboard.bno }"/>'>
 						<input type='hidden' name='pageNum' value='<c:out value="${cri.pageNum }"/>'>
@@ -131,11 +138,9 @@ function generateReplyList(list){
 			str += "<img src='/resources/img/arrowup.jpg'>"
 		}
 		str += list[i].repliername + "</strong>";
-		str += "			<small class='float-right text-muted'>" + replyService.displayTime(list[i].replydate) +"</small>";
-		str += "		</div>";
-		str += "		<div>";
-		str += "			<p>"+list[i].reply+"</p>";
 		str += "			<div class='float-right'>";
+		str += "				<small class='text-muted'>" + replyService.displayTime(list[i].replydate) +"</small><br>";
+		str += "				<img data-bno='<c:out value='${freeboard.bno }'/>' data-casekind='r' data-targetno='"+list[i].rno+"' class='sirenBtn' src='/resources/img/siren.png'><br>";
 		if(list[i].isdelete == 'N'){
 		str += "				<button class='btn btn-xs modify-btn'>수정하기</button>";
 		str += "				<button class='btn btn-xs remove-btn'>삭제하기</button>";
@@ -143,7 +148,10 @@ function generateReplyList(list){
 		if(list[i].replyto == null){
 		str += "				<button class='btn btn-xs rereply-btn'>답글달기</button>";
 		}
-		str += "			</div>";	
+		str += "			</div>";
+		str += "		</div>";
+		str += "		<div>";
+		str += "			<p>"+list[i].reply+"</p>";
 		str += "		</div>";
 		str += "	</div>";
 		str += "</li>";
@@ -189,12 +197,13 @@ function generateChangeWindow(){
 }
 </script>
 <script>
+</script>
+<script>
 var bnoValue = '<c:out value="${freeboard.bno}"/>';
 var amount = '<c:out value="${cri.amount }"/>';
 $(document).ready(function(){
 	var pageNum = 1;
 	var replyPageFooter = $(".card-footer");
-	
 	function showReplyPage(replyCnt){
 		var endNum = Math.ceil(pageNum*1.0/amount)*amount;
 		var startNum = endNum - (amount-1);
@@ -232,6 +241,12 @@ $(document).ready(function(){
 		str += "		<a href='"+(endNum+1)+"' class='page-link'>Next</a>";
 		str += "	</li>";
 		replyPageFooter.html(str);
+		$(".sirenBtn").off("click");
+		$(".sirenBtn").on("click",function(e){
+			var targetno = $(this).data("targetno");
+			var casekind = $(this).data("casekind");
+			sendDeclaration(targetno,casekind);
+		})
 	}
 	replyPageFooter.on("click","li a",function(e){
 		e.preventDefault();
@@ -242,6 +257,22 @@ $(document).ready(function(){
 		showList(pageNum);
 	});
 	var addReplyShow = false;
+	function sendDeclaration(targetno,casekind){
+		$.ajax({
+			type: 'post',
+			url: '/freeboard/report',
+			data: JSON.stringify({targetno:targetno,casekind:casekind}),
+			contentType: 'application/json; charset=utf-8',
+			success:function(result,status,xhr){
+				if(result === 'success'){
+					alert("신고가 완료되었습니다");
+				}
+			},
+			error:function(error){
+				alert("신고를 완료하지 못했습니다. 누가 이미 신고를 하였습니다.");
+			}
+		})
+	}
 	function addReply(rno,beforeElement){
 		if(addReplyShow == false){
 			beforeElement.before(generateReplyWindow());
@@ -272,6 +303,11 @@ $(document).ready(function(){
 	}
 	var replyUL = $(".chat");
 	showList(1);
+	$(".sirenBtn").on("click",function(e){
+		var targetno = $(this).data("targetno");
+		var casekind = $(this).data("casekind");
+		sendDeclaration(targetno,casekind);
+	})
 	function showList(page){
 		replyService.getList({bno:bnoValue, page: page||1},function(data){
 			var replyCnt = data.replyCnt;
