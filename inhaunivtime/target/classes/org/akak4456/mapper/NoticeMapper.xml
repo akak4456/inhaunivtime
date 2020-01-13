@@ -44,4 +44,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		updatedate=sysdate
 	where bno = #{bno}
 </update>
+<select id="getTotal" resultType="int">
+	select count(*) from tbl_notice
+</select>
 </mapper>

@@ -15,4 +15,6 @@ public interface ReportMapper {
 	public int insertSelectKey(ReportVO vo);
 	
 	public int delete(Long caseno);
+	
+	public int getTotal();
 }

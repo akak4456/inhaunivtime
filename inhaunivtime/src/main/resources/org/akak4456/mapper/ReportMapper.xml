@@ -11,11 +11,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <select id="getListWithPaging" resultType="org.akak4456.domain.ReportVO">
 	<![CDATA[
 	select
-		caseno, targetno, casekind
+		caseno, targetno, casekind, regdate
 	from
 		(
 		select /*+INDEX_DESC(tbl_report pk_report) */
-			rownum rn, caseno, targetno, casekind
+			rownum rn, caseno, targetno, casekind, regdate
 		from
 			tbl_report
 		where rownum <= #{pageNum} * #{amount}
@@ -36,4 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <delete id="delete">
 	delete tbl_report where caseno=#{caseno}
 </delete>
+<select id="getTotal" resultType="int">
+	select count(*) from tbl_report
+</select>
 </mapper>
