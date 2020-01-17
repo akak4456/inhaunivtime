@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@include file="../includes/header.jsp"%>
 <style>
 .card-body a {
@@ -38,6 +39,7 @@
 				</div>
 				<div class="card-body">
 					<form role="form" action="/freeboard/modify" method="post">
+						<input type='hidden' name="${_csrf.parameterName }" value="${_csrf.token }"/>
 						<input type='hidden' name='pageNum' value='<c:out value="${cri.pageNum }"/>'>
 						<input type='hidden' name='amount' value='<c:out value="${cri.amount }"/>'>
 						<input type='hidden' name='type' value='<c:out value="${cri.type }"/>'>
@@ -58,8 +60,8 @@
 									value="${freeboard.content }" /></textarea>
 						</div>
 						<div class="form-group">
-							<label>작성자</label> <input type="text" name="writername"
-								value='<c:out value="${freeboard.writername }"/>'
+							<label>작성자</label> <input type="text" name="userid"
+								value='<c:out value="${freeboard.userid }"/>'
 								readonly="readonly" class="form-control">
 						</div>
 						<div class="form-group">
@@ -72,8 +74,13 @@
 							<input class="form-control" name='updatedate'
 							value='<fmt:formatDate pattern="yyyy/MM/dd" value="${freeboard.updatedate }"/>' readonly="readonly">
 						</div>
+						<sec:authentication property="principal" var="pinfo"/>
+						<sec:authorize access="isAuthenticated()">
+						<c:if test="${pinfo.username eq freeboard.userid }">
 						<button type="submit" data-oper='modify' class="btn btn-success">수정</button>
 						<button type="submit" data-oper='remove' class="btn btn-danger">삭제</button>
+						</c:if>
+						</sec:authorize>
 						<button type="submit" data-oper='list' class="btn btn-info">목록</button>
 					</form>
 				</div>
@@ -208,6 +215,8 @@ $(document).ready(function(){
 		}
 		return true;
 	}
+	var csrfHeaderName = "${_csrf.headerName}";
+	var csrfTokenValue = "${_csrf.token}";
 	$("input[type='file']").change(function(e){
 		var formData = new FormData();
 		var inputFile = $("input[name='uploadFile']");
@@ -223,6 +232,9 @@ $(document).ready(function(){
 			url: '/uploadAjaxAction',
 			processData:false,
 			contentType:false,
+			beforeSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+			},
 			data:formData,
 			type:'POST',
 			dataType:'json',
@@ -265,6 +277,9 @@ $(document).ready(function(){
 			$.ajax({
 				url:'/deleteFile',
 				data:{fileName:targetFile,type:type},
+				beforeSend:function(xhr){
+					xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+				},
 				dataType:'text',
 				type:'POST',
 				success:function(result){

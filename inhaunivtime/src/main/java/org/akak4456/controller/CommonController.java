@@ -10,10 +10,21 @@ import lombok.extern.log4j.Log4j;
 
 @Controller
 @Log4j
-@RequestMapping("/general/*")
 public class CommonController {
-	@GetMapping("/general")
-	public void general(Model model) {
-		log.info("access general");
+	@GetMapping("/accessError")
+	public void accessError() {
+		
+	}
+	
+	@GetMapping("/customLogin")
+	public void loginInput(String error, String logout, Model model) {
+		log.info("error: "+error);
+		log.info("logout: "+logout);
+		if(error != null) {
+			model.addAttribute("error","아이디 또는 비밀번호가 틀렸습니다");
+		}
+		if(logout != null) {
+			model.addAttribute("logout","로그아웃 되었습니다");
+		}
 	}
 }

@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@include file="../includes/header.jsp"%>
 <style>
 .card-body a{
@@ -52,14 +53,19 @@ ul.chat{
 						<textarea class="form-control" rows="3" name='content' readonly="readonly"><c:out value="${freeboard.content }"/></textarea>
 					</div>
 					<div class="form-group">
-						<label>작성자</label> <input type="text" name="writername" value='<c:out value="${freeboard.writername }"/>' 
+						<label>작성자</label> <input type="text" name="userid" value='<c:out value="${freeboard.userid }"/>' 
 							readonly="readonly" class="form-control">
 					</div>
 					<div class="form-group">
 						<label>추천수</label> 
-						<input type="text" name="writername" value='<c:out value="${freeboard.recommendcnt }"/>' readonly="readonly" class="form-control">
+						<input type="text" name="recommendcnt" value='<c:out value="${freeboard.recommendcnt }"/>' readonly="readonly" class="form-control">
 					</div>
-					<button data-oper='modify' class="btn btn-success">수정/삭제</button>
+					<sec:authentication property="principal" var="pinfo"/>
+					<sec:authorize access="isAuthenticated()">
+						<c:if test="${pinfo.username eq freeboard.userid }">
+							<button data-oper='modify' class="btn btn-success">수정/삭제</button>
+						</c:if>
+					</sec:authorize>
 					<button data-oper='recommend' class="btn btn-success">추천하기</button>
 					<button data-oper='list' class="btn btn-info">목록</button>
 					<div class='float-right'>
@@ -78,7 +84,9 @@ ul.chat{
 			<div class="card mb-3">
 				<div class="card-header">
 					<i class="fas fa-comments"></i> 댓글
+					<sec:authorize access="hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')">
 					<button id='addReplyBtn' type="button" class="btn btn-xs float-right">답글 달기</button>
+					</sec:authorize>
 				</div>
 				<div class="card-body">
 					<ul class="chat">
@@ -145,9 +153,11 @@ function generateReplyList(list){
 		str += "				<button class='btn btn-xs modify-btn'>수정하기</button>";
 		str += "				<button class='btn btn-xs remove-btn'>삭제하기</button>";
 		}
+		<sec:authorize access="hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')">
 		if(list[i].replyto == null){
 		str += "				<button class='btn btn-xs rereply-btn'>답글달기</button>";
 		}
+		</sec:authorize>
 		str += "			</div>";
 		str += "		</div>";
 		str += "		<div>";

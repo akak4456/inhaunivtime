@@ -10,7 +10,7 @@ public class FreeBoardVO {
 	private Long bno;
 	private String title;
 	private String content;
-	private String writername;
+	private String userid;
 	private Long replycnt;
 	private Long recommendcnt;
 	private Date regdate;

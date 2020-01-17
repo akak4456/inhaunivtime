@@ -56,7 +56,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 		attachMapper.deleteAll(freeBoard.getBno());
 		
 		boolean modifyResult = freeBoardMapper.update(freeBoard) == 1;
-		if(modifyResult && freeBoard.getAttachList().size() > 0) {
+		if(modifyResult && freeBoard.getAttachList() != null && freeBoard.getAttachList().size() > 0) {
 			freeBoard.getAttachList().forEach(attach->{
 				attach.setBno(freeBoard.getBno());
 				attachMapper.insert(attach);

@@ -11,11 +11,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <select id="getListWithPaging" resultType="org.akak4456.domain.FreeBoardVO">
 	<![CDATA[
 	select
-		bno,title,content,writername,replycnt,recommendcnt ,regdate,updatedate
+		bno,title,content,userid,replycnt,recommendcnt ,regdate,updatedate
 	from
 		(
 		select /*+INDEX_DESC(tbl_free_board pk_free_board) */
-			rownum rn, bno, title,content,writername,replycnt,recommendcnt, regdate, updatedate
+			rownum rn, bno, title,content,userid,replycnt,recommendcnt, regdate, updatedate
 		from
 			tbl_free_board
 		where
@@ -30,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <select id="getHotBoard" resultType="org.akak4456.domain.FreeBoardVO">
 	<![CDATA[
 	select /*+INDEX(tbl_free_board idx_free_board) */
-		rownum,bno,title,content,writername,replycnt,recommendcnt,regdate,updatedate
+		rownum,bno,title,content,userid,replycnt,recommendcnt,regdate,updatedate
 	from
 		tbl_free_board
 	where (sysdate - regdate) <= 1 and rownum <= #{amount}
@@ -43,8 +43,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<selectKey keyProperty="bno" order="BEFORE" resultType="long">
 		select seq_free_board.nextval from dual
 	</selectKey>
-	insert into tbl_free_board(bno,title,content,writername)
-	values (#{bno},#{title},#{content},#{writername})
+	insert into tbl_free_board(bno,title,content,userid)
+	values (#{bno},#{title},#{content},#{userid})
 </insert>
 <select id="read" resultType="org.akak4456.domain.FreeBoardVO">
 	select * from tbl_free_board where bno = #{bno}

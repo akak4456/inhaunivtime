@@ -49,7 +49,7 @@
 											<img src="/resources/img/like.png" width="20px" height="20px"> <c:out value="${freeboard.recommendcnt }"/>
 										</c:if>
 									</td>
-									<td><c:out value="${freeboard.writername }"/></td>
+									<td><c:out value="${freeboard.userid }"/></td>
 									<td><fmt:formatDate pattern="yyyy-MM-dd" value="${freeboard.regdate }"/></td>
 									<td><fmt:formatDate pattern="yyyy-MM-dd" value="${freeboard.updatedate }"/></td>
 								</tr>
@@ -90,7 +90,7 @@
 											<img src="/resources/img/like.png" width="20px" height="20px"> <c:out value="${freeboard.recommendcnt }"/>
 										</c:if>
 									</td>
-									<td><c:out value="${freeboard.writername }"/></td>
+									<td><c:out value="${freeboard.userid }"/></td>
 									<td><fmt:formatDate pattern="yyyy-MM-dd" value="${freeboard.regdate }"/></td>
 									<td><fmt:formatDate pattern="yyyy-MM-dd" value="${freeboard.updatedate }"/></td>
 								</tr>

@@ -3,7 +3,6 @@ package org.akak4456.controller;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import org.akak4456.domain.AttachVO;
@@ -15,6 +14,7 @@ import org.akak4456.service.FreeBoardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +35,6 @@ import lombok.extern.log4j.Log4j;
 @AllArgsConstructor
 public class FreeBoardController {
 	private FreeBoardService freeBoardService;
-	
 	@GetMapping("/list")
 	public void list(Criteria cri,Model model) {
 		log.info("list: "+cri);
@@ -48,10 +47,13 @@ public class FreeBoardController {
 		model.addAttribute("noticeone",freeBoardService.getRecentOneNotice());
 	}
 	
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')")
 	@GetMapping("/register")
 	public void register() {
 		
 	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')")
 	@PostMapping("/register")
 	public String register(FreeBoardVO freeboard, RedirectAttributes rttr) {
 		log.info("register: "+freeboard);
@@ -71,6 +73,7 @@ public class FreeBoardController {
 		model.addAttribute("freeboard",freeBoardService.get(bno));
 	}
 	
+	@PreAuthorize("principal.username == #freeboard.userid")
 	@PostMapping("/modify")
 	public String modify(FreeBoardVO freeboard,@ModelAttribute("cri") Criteria cri, RedirectAttributes rttr) {
 		log.info("modify: "+freeboard);
@@ -94,8 +97,9 @@ public class FreeBoardController {
 		return "redirect:/freeboard/get?bno="+bno;
 	}
 	
+	@PreAuthorize("principal.username == #userid")
 	@PostMapping("/remove")
-	public String remove(@RequestParam("bno") Long bno,@ModelAttribute("cri") Criteria cri ,RedirectAttributes rttr) {
+	public String remove(@RequestParam("bno") Long bno,@ModelAttribute("cri") Criteria cri ,RedirectAttributes rttr, String userid) {
 		log.info("remove: "+bno);
 		List<AttachVO> attachList = freeBoardService.getAttachList(bno);
 		if(freeBoardService.remove(bno)) {
@@ -106,6 +110,7 @@ public class FreeBoardController {
 		}
 		return "redirect:/freeboard/list"+cri.getListLink();
 	}
+	
 	@GetMapping(value="/getAttachList",produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
 	public ResponseEntity<List<AttachVO>> getAttachList(Long bno){

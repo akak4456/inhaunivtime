@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@include file="../includes/header.jsp"%>
 <style>
 .uploadResult{
@@ -34,6 +35,7 @@
 				</div>
 				<div class="card-body">
 					<form role="form" action="/freeboard/register" method="post">
+						<input type="hidden" name="${_csrf.parameterName }" value="${_csrf.token }"/>
 						<div class="form-group">
 							<label>제목</label>
 							<input type="text" name="title" class="form-control">
@@ -44,7 +46,8 @@
 						</div>
 						<div class="form-group">
 							<label>작성자</label>
-							<input type="text" name="writername" class="form-control">
+							<input type="text" name="userid" class="form-control"
+							value='<sec:authentication property="principal.username"/>' readonly="readonly">
 						</div>
 						<button type="submit" class="btn btn-primary">작성하기</button>
 						<button type="reset" class="btn btn-danger">초기화하기</button>
@@ -135,6 +138,8 @@ $(document).ready(function(e){
 		}
 		return true;
 	}
+	var csrfHeaderName = "${_csrf.headerName}";
+	var csrfTokenValue = "${_csrf.token}";
 	$("input[type='file']").change(function(e){
 		var formData = new FormData();
 		var inputFile = $("input[name='uploadFile']");
@@ -150,6 +155,9 @@ $(document).ready(function(e){
 			url: '/uploadAjaxAction',
 			processData:false,
 			contentType:false,
+			beforeSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+			},
 			data:formData,
 			type:'POST',
 			dataType:'json',
@@ -192,6 +200,9 @@ $(document).ready(function(e){
 			$.ajax({
 				url:'/deleteFile',
 				data:{fileName:targetFile,type:type},
+				beforeSend:function(xhr){
+					xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+				},
 				dataType:'text',
 				type:'POST',
 				success:function(result){
