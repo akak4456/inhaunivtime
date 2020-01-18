@@ -1,10 +1,9 @@
 package org.akak4456.controller;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import lombok.extern.log4j.Log4j;
 
@@ -26,5 +25,15 @@ public class CommonController {
 		if(logout != null) {
 			model.addAttribute("logout","로그아웃 되었습니다");
 		}
+	}
+	
+	@GetMapping("/customLogout")
+	public void logoutGET() {
+		log.info("customLogout get");
+	}
+	
+	@PostMapping("/customLogout")
+	public void logoutPOST() {
+		
 	}
 }

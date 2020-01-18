@@ -131,13 +131,17 @@ ul.chat{
 </div>
 <script src="/resources/js/reply.js"></script>
 <script>
+var currentReplier = "";
+<sec:authorize access="hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')">
+currentReplier = "<sec:authentication property='principal.username'/>";
+</sec:authorize>
 function generateReplyList(list){
 	var str = "";
 	for(var i=0,len=list.length||0;i<len;i++){
 		if(list[i].replyto != null){
-		str += "<li class='left clearfix reply rereply' data-rno='"+list[i].rno+"'>";	
+		str += "<li class='left clearfix reply rereply' data-rno='"+list[i].rno+"' data-replier='"+list[i].repliername+"'>";	
 		}else{
-		str += "<li class='left clearfix reply' data-rno='"+list[i].rno+"'>";	
+		str += "<li class='left clearfix reply' data-rno='"+list[i].rno+"' data-replier='"+list[i].repliername+"'>";	
 		}
 		str += "	<div>";
 		str += "		<div class='header'>";
@@ -149,7 +153,7 @@ function generateReplyList(list){
 		str += "			<div class='float-right'>";
 		str += "				<small class='text-muted'>" + replyService.displayTime(list[i].replydate) +"</small><br>";
 		str += "				<img data-bno='<c:out value='${freeboard.bno }'/>' data-casekind='r' data-targetno='"+list[i].rno+"' class='sirenBtn' src='/resources/img/siren.png'><br>";
-		if(list[i].isdelete == 'N'){
+		if(list[i].isdelete == 'N' && currentReplier == list[i].repliername){
 		str += "				<button class='btn btn-xs modify-btn'>수정하기</button>";
 		str += "				<button class='btn btn-xs remove-btn'>삭제하기</button>";
 		}
@@ -177,7 +181,10 @@ function generateReplyWindow(){
 	str += "			답글";
 	str += "			<textarea class='form-control' rows='3' id='newreply'></textarea>";
 	str += "			작성자";
-	str += "			<input class='form-control' type='text' id='newreplier'>";
+	<sec:authorize access="isAuthenticated()">
+	str += "			<input class='form-control' type='text' id='newreplier' readonly='readonly' value='"+
+	currentReplier+"'>";
+	</sec:authorize>
 	str += "		</div>";
 	str += "		<div class='float-right'>";
 	str += "			<button id='addDoneBtn' type='button' class='btn btn-success'>등록완료</button>";
@@ -195,7 +202,7 @@ function generateChangeWindow(){
 	str += "			답글";
 	str += "			<textarea class='form-control' rows='3' id='changereply'></textarea>";
 	str += "			작성자";
-	str += "			<input class='form-control' type='text' id='changereplier' readonly='readonly'>";
+	str += "			<input class='form-control' type='text' id='changereplier' readonly='readonly' value='"+currentReplier+"'>";
 	str += "		</div>";
 	str += "		<div class='float-right'>";
 	str += "			<button id='changeDoneBtn' type='button' class='btn btn-success'>수정완료</button>";
@@ -212,6 +219,11 @@ function generateChangeWindow(){
 var bnoValue = '<c:out value="${freeboard.bno}"/>';
 var amount = '<c:out value="${cri.amount }"/>';
 $(document).ready(function(){
+	$(document).ajaxSend(function(e,xhr,options){
+		var csrfHeaderName ="${_csrf.headerName}";
+		var csrfTokenValue ="${_csrf.token}";
+		xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+	});
 	var pageNum = 1;
 	var replyPageFooter = $(".card-footer");
 	function showReplyPage(replyCnt){
@@ -301,6 +313,8 @@ $(document).ready(function(){
 				replyService.add(reply,function(result){
 					if(result === 'success')
 						alert("댓글을 달았습니다");
+					else
+						alert(result);
 					addReplyShow = false;
 					$(".addreply").remove();
 					showList(-1);
@@ -339,6 +353,11 @@ $(document).ready(function(){
 			$(".modify-btn").on("click",function(e){
 				if(modifyShow == false){
 					var rno = $(this).parents("li").data("rno");
+					var originalReplyer = $(this).parents("li").data("replier");
+					if(originalReplyer != currentReplier){
+						alert("작성자와 같지 않습니다");
+						return;
+					}
 					var beforeElement = $(".chat li[data-rno='"+rno+"']").next();
 					beforeElement.before(generateChangeWindow());
 					modifyShow = true;
@@ -349,6 +368,7 @@ $(document).ready(function(){
 					$("#changeDoneBtn").on("click",function(e){
 						var reply = {
 								reply:$("#changereply").val(),
+								repliername: currentReplier,
 								rno:rno
 						};
 						replyService.update(reply,function(result){
@@ -366,7 +386,18 @@ $(document).ready(function(){
 			});
 			$(".remove-btn").on("click",function(e){
 				var rno = $(this).parents("li").data("rno");
-				replyService.remove(rno,function(result){
+				var originalReplyer = $(this).parents("li").data("replier");
+				if(originalReplyer != currentReplier){
+					alert("작성자와 같지 않습니다");
+					return;
+				}
+				var reply ={
+						rno:rno,
+						repliername:currentReplier,
+						bno:bnoValue,
+						reply:"abc"
+				};
+				replyService.remove(reply,function(result){
 					if(result==='success'){
 						alert("삭제가 완료되었습니다");
 						showList(pageNum);
