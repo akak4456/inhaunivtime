@@ -16,14 +16,15 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
 	<!-- Root Context: defines shared resources visible to all other web components -->
+	<context:property-placeholder location="classpath*:config/*"/>
 	<context:annotation-config></context:annotation-config>
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName"
-			value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+			value="${jdbc.driver}"></property>
 		<property name="jdbcUrl"
-			value="jdbc:log4jdbc:oracle:thin:@localhost:1521:XE"></property>
-		<property name="username" value="akak4456"></property>
-		<property name="password" value="1111"></property>
+			value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
 	</bean>
 	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
 		destroy-method="close">
@@ -34,15 +35,33 @@
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
 	<bean id="transactionManager"
-			class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource"></property>		
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
 	</bean>
-	<tx:annotation-driven/>
+	<tx:annotation-driven />
 	<mybatis-spring:scan
 		base-package="org.akak4456.mapper" />
-	<context:component-scan base-package="org.akak4456.service">
+	<context:component-scan
+		base-package="org.akak4456.service">
 	</context:component-scan>
 	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
-	<context:component-scan base-package="org.akak4456.task"></context:component-scan>
-	<task:annotation-driven/>
+	<context:component-scan
+		base-package="org.akak4456.task"></context:component-scan>
+	<task:annotation-driven />
+	<!-- mail Sender -->
+	<bean id="mailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="587" />
+		<property name="username" value="${email.username}" />
+		<property name="password" value="${email.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.debug">true</prop>
+			</props>
+		</property>
+	</bean>
 </beans>
