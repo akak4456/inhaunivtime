@@ -36,4 +36,9 @@ public class CommonController {
 	public void logoutPOST() {
 		
 	}
+	
+	@GetMapping("/join")
+	public void joinGet() {
+		
+	}
 }
