@@ -57,8 +57,7 @@
 					<input type="hidden" name="${_csrf.parameterName }" value="${_csrf.token }"/>
 				</form>
 				<div class="text-center">
-					<a class="d-block small mt-3" href="register.html">회왼가입</a> 
-					<a class="d-block small" href="forgot-password.html">비밀번호 찾기</a>
+					<a class="d-block small mt-3" href="/join">회원가입</a> 
 				</div>
 			</div>
 		</div>

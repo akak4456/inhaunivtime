@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@include file="../includes/header.jsp"%>
 <div id="wrapper">
 	<%@include file="../includes/wrapper_sidebar.jsp"%>
@@ -62,7 +63,9 @@
 			<div class="card mb-3">
 				<div class="card-header">
 					<i class="fas fa-table"></i> 자유게시판
+					<sec:authorize access="hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')">
 					<button id='regBtn' type="button" class="btn btn-xs float-right">새글 등록</button>
+					</sec:authorize>
 				</div>
 				<div class="card-body">
 					<div class="table-responsive">

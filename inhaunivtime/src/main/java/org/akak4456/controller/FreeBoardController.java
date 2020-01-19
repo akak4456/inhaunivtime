@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -86,8 +87,9 @@ public class FreeBoardController {
 		return "redirect:/freeboard/list"+cri.getListLink();
 	}
 	
-	@PostMapping("/recommend")
-	public String updateRecommend(@RequestParam("bno") Long bno, RedirectAttributes rttr) {
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT','ROLE_MEMBER')")
+	@GetMapping("/recommend/{bno}")
+	public String updateRecommend(@PathVariable("bno") Long bno, RedirectAttributes rttr) {
 		log.info("coutup recommend: "+bno );
 		if(freeBoardService.recommendCountUp(bno)) {
 			rttr.addFlashAttribute("result","updaterecommendsuccess");

@@ -7,6 +7,7 @@
 <title>인하대타임</title>
 </head>
 <body>
-Error
+<h1>Access Denined</h1>
+<a href="/freeboard/list">게시판으로</a>
 </body>
 </html>

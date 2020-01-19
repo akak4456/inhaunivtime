@@ -65,8 +65,8 @@ ul.chat{
 						<c:if test="${pinfo.username eq freeboard.userid }">
 							<button data-oper='modify' class="btn btn-success">수정/삭제</button>
 						</c:if>
-					</sec:authorize>
 					<button data-oper='recommend' class="btn btn-success">추천하기</button>
+					</sec:authorize>
 					<button data-oper='list' class="btn btn-info">목록</button>
 					<div class='float-right'>
 						<img data-bno='<c:out value='${freeboard.bno }'/>' data-casekind='b' data-targetno='<c:out value='${freeboard.bno }'/>' class="sirenBtn" src='/resources/img/siren.png'>
@@ -428,8 +428,8 @@ $(document).ready(function(){
 		operForm.attr("action","/freeboard/modify").submit();
 	});
 	$("button[data-oper='recommend']").on("click",function(e){
-		operForm.attr("method","post");
-		operForm.attr("action","/freeboard/recommend").submit();
+		e.preventDefault();
+		window.location.href = "/freeboard/recommend/"+bnoValue;
 	});
 	$("button[data-oper='list']").on("click",function(e){
 		operForm.find("#bno").remove();

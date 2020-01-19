@@ -8,4 +8,6 @@ public interface MemberMapper {
 	public int countForId(String userid);
 	
 	public int countForEmail(String email);
+	
+	public int insert(MemberVO vo);
 }

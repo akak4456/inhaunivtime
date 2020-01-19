@@ -32,4 +32,8 @@ WHERE
 <select id="countForEmail" resultType="int">
 	select count(*) from tbl_member where email=#{email}
 </select>
+<insert id="insert">
+	insert into tbl_member(userid,userpw,username<if test="email != null">,email</if>)
+	values (#{userid},#{userpw},#{username}<if test="email != null">,#{email}</if>)
+</insert>
 </mapper>
